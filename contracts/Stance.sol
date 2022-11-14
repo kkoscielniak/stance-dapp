@@ -38,8 +38,10 @@ contract Stance {
     return questions[id];
   }
 
-  function answerQuestion(Question memory _question, bool positiveAnswer) public pure {
-    if (positiveAnswer) {
+  function answerQuestion(uint _id, bool _isAnswerPositive) public {
+    Question storage _question = questions[_id];
+
+    if (_isAnswerPositive) {
       _question.positiveResponsesCount++; // TODO: Use SafeMath
     } else {
       _question.negativeResponsesCount++; // TODO: SafeMath
@@ -47,7 +49,9 @@ contract Stance {
   }
 
   // TODO: Use SafeMath here
-  function _getPositiveResponsesRatioForQuestion(Question memory _question) public pure returns (uint16) {
-    return _question.positiveResponsesCount / (_question.negativeResponsesCount + _question.positiveResponsesCount);
-  }
+  // function getPositiveResponsesRatioForQuestion(uint _id) public view returns (uint16) {
+  //   Question memory _question = questions[_id]; 
+
+  //   return _question.positiveResponsesCount / (_question.negativeResponsesCount + _question.positiveResponsesCount);
+  // }
 }

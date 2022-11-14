@@ -25,19 +25,22 @@ const main = async () => {
   );
   await secondQuestionTxn.wait();
 
-  let allQuestions = await stanceContract.getAllQuestions();
-  console.log(allQuestions);
+  // let allQuestions = await stanceContract.getAllQuestions();
+  // console.log(allQuestions);
 
   let q1 = await stanceContract.getQuestionById(1);
-  // await q1.wait(); 
-  console.log(q1);
+  // await q1.wait();
+  // console.log(q1);
 
 
-  // const answerQuestionTxn = await stanceContract.answerQuestion(question, true); 
-  // answerQuestionTxn.wait();
+  const firstResponseTxn = await stanceContract.answerQuestion(1, true); 
+  firstResponseTxn.wait();
 
-  // allQuestions = await stanceContract.getAllQuestions();
-  // console.log(allQuestions);
+  const secondResponseTxn = await stanceContract.answerQuestion(1, false);
+  secondResponseTxn.wait();
+
+  let allQuestions = await stanceContract.getAllQuestions();
+  console.log(allQuestions);
 };
 
 const runMain = async () => {
