@@ -5,6 +5,8 @@
     "hardhat": "^2.12.2"
   },
   "scripts": {
-    "local": "npx hardhat run scripts/run.ts"
+    "once": "npx hardhat run scripts/run.ts",
+    "local": "npx hardhat run --network localhost scripts/deploy.ts",
+    "local-node": "npx hardhat node"
   }
 }
