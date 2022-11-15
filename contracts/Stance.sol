@@ -9,9 +9,7 @@ contract Stance {
 
   event QuestionAsked(uint id, string question, address author);
 
-  constructor() {
-    console.log("This is a test");
-  }
+  constructor() {}
 
   function askQuestion(
     string memory _question
@@ -47,11 +45,4 @@ contract Stance {
       _question.negativeResponsesCount++; // TODO: SafeMath
     }
   }
-
-  // TODO: Use SafeMath here
-  // function getPositiveResponsesRatioForQuestion(uint _id) public view returns (uint16) {
-  //   Question memory _question = questions[_id]; 
-
-  //   return _question.positiveResponsesCount / (_question.negativeResponsesCount + _question.positiveResponsesCount);
-  // }
 }
