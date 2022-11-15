@@ -36,13 +36,24 @@ contract Stance {
     return questions[id];
   }
 
-  function answerQuestion(uint _id, bool _isAnswerPositive) public {
-    Question storage _question = questions[_id];
+  // function answerQuestion(uint _id, bool _isAnswerPositive) public {
+  //   Question storage _question = questions[_id];
 
-    if (_isAnswerPositive) {
-      _question.positiveResponsesCount++; // TODO: Use SafeMath
-    } else {
-      _question.negativeResponsesCount++; // TODO: SafeMath
-    }
+  //   if (_isAnswerPositive) {
+  //     _question.positiveResponsesCount++; // TODO: Use SafeMath
+  //   } else {
+  //     _question.negativeResponsesCount++; // TODO: SafeMath
+  //   }
+  // }
+
+  // TODO: Describe why they are split instead of taking a parameter
+  function respondToQuestionPositively(uint _id) public {
+    Question storage _question = questions[_id];
+    _question.positiveResponsesCount++; // TODO use SafeMath
+  }
+
+  function respondToQuestionNegatively(uint _id) public {
+    Question storage _question = questions[_id];
+    _question.negativeResponsesCount++; // TODO use SafeMath
   }
 }

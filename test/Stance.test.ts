@@ -52,7 +52,7 @@ describe.only("Stance", () => {
 
       await StanceContract.askQuestion("Is this a real life?");
 
-      await StanceContract.connect(otherAccount).answerQuestion(0, true);
+      await StanceContract.connect(otherAccount).respondToQuestionPositively(0);
 
       const question = await StanceContract.getQuestionById(0);
       expect(question.positiveResponsesCount).to.eq(1);
@@ -66,7 +66,7 @@ describe.only("Stance", () => {
 
       await StanceContract.askQuestion("Is this just fantasy?");
 
-      await StanceContract.connect(otherAccount).answerQuestion(0, false);
+      await StanceContract.connect(otherAccount).respondToQuestionNegatively(0);
 
       const question = await StanceContract.getQuestionById(0);
       expect(question.positiveResponsesCount).to.eq(0);
@@ -80,8 +80,8 @@ describe.only("Stance", () => {
 
       await StanceContract.askQuestion("Is this just fantasy?");
 
-      await StanceContract.connect(otherAccount).answerQuestion(0, false);
-      await StanceContract.connect(otherAccount2).answerQuestion(0, true);
+      await StanceContract.connect(otherAccount).respondToQuestionNegatively(0);
+      await StanceContract.connect(otherAccount2).respondToQuestionPositively(0);
 
       const question = await StanceContract.getQuestionById(0);
       expect(question.positiveResponsesCount).to.eq(1);
