@@ -13,6 +13,7 @@ const config: HardhatUserConfig = {
   },
   watcher: {
     test: {
+      files: ['./contracts', "./test"],
       tasks: [{ command: "test" }],
     },
   },
