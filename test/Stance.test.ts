@@ -78,14 +78,32 @@ describe.only("Stance", () => {
         deployStanceFixture
       );
 
-      await StanceContract.askQuestion("Is this just fantasy?");
+      await StanceContract.askQuestion("Is this both?");
 
       await StanceContract.connect(otherAccount).respondToQuestionNegatively(0);
-      await StanceContract.connect(otherAccount2).respondToQuestionPositively(0);
+      await StanceContract.connect(otherAccount2).respondToQuestionPositively(
+        0
+      );
 
       const question = await StanceContract.getQuestionById(0);
       expect(question.positiveResponsesCount).to.eq(1);
       expect(question.negativeResponsesCount).to.eq(1);
+    });
+
+    it("should allow the user only one response per question", async () => {
+      const { StanceContract, otherAccount, otherAccount2 } = await loadFixture(
+        deployStanceFixture
+      );
+
+      await StanceContract.askQuestion("Is this a real life?");
+
+      await StanceContract.connect(otherAccount).respondToQuestionPositively(0);
+      await StanceContract.connect(otherAccount2).respondToQuestionPositively(
+        0
+      );
+      await expect(
+        StanceContract.connect(otherAccount).respondToQuestionPositively(0)
+      ).to.be.revertedWith("Can't answer the same question twice");
     });
   });
 });
