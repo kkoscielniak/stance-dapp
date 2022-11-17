@@ -13,6 +13,11 @@ contract Stance {
         _;
     }
 
+    modifier onlyNonOwner(uint _id) {
+        require(questions[_id].author != msg.sender, "Can't answer your own question");
+        _;
+    }
+
     Question[] private questions;
 
     mapping(address => Question) answeredQuestionsMapping;
@@ -49,6 +54,7 @@ contract Stance {
     function respondToQuestionPositively(uint _id)
         public
         onlyOncePerUserPerQuestion
+        onlyNonOwner(_id)
     {
         Question storage _question = questions[_id];
         _question.positiveResponsesCount++; // TODO use SafeMath
@@ -58,6 +64,7 @@ contract Stance {
     function respondToQuestionNegatively(uint _id)
         public
         onlyOncePerUserPerQuestion
+        onlyNonOwner(_id)
     {
         Question storage _question = questions[_id];
         _question.negativeResponsesCount++; // TODO use SafeMath

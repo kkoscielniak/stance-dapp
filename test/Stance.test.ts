@@ -105,5 +105,15 @@ describe.only("Stance", () => {
         StanceContract.connect(otherAccount).respondToQuestionPositively(0)
       ).to.be.revertedWith("Can't answer the same question twice");
     });
+
+    it("should not allow the user to answer his own question", async () => {
+      const { StanceContract, owner } = await loadFixture(deployStanceFixture);
+
+      await StanceContract.askQuestion("Is this a real life?");
+
+      await expect(
+        StanceContract.connect(owner).respondToQuestionPositively(0)
+      ).to.be.revertedWith("Can't answer your own question");
+    });
   });
 });
