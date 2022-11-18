@@ -26,10 +26,11 @@
     "typescript": ">=4.5.0"
   },
   "scripts": {
-    "deploy": "npx hardhat run scripts/deploy.ts --network goerli",
-    "local": "npx hardhat run --network localhost scripts/deploy.ts",
-    "local-node": "npx hardhat node",
-    "test": "npx hardhat test",
+    "deploy": "hardhat run scripts/deploy.ts --network goerli --verbose",
+    "local": "hardhat run --network localhost scripts/deploy.ts",
+    "local-node": "hardhat node",
+    "test": "hardhat test",
+    "test:watch": "hardhat watch test",
     "prepare": "husky install"
   }
 }
