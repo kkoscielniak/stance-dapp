@@ -33,6 +33,56 @@ describe.only("Stance", () => {
   });
 
   describe("Getting questions", async () => {
+    it("should return all questions", async () => {
+      const { StanceContract } = await loadFixture(deployStanceFixture);
+
+      await StanceContract.askQuestion("Is this a real life?");
+      await StanceContract.askQuestion("Is this just fantasy?");
+      const questions = await StanceContract.getAllQuestions();
+
+      expect(questions.length).to.eq(2);
+    });
+
+    it("should return all questions with `owned` property", async () => {
+      const { StanceContract, otherAccount, otherAccount2 } = await loadFixture(
+        deployStanceFixture
+      );
+
+      // ask question as an `otherAccount`
+      await StanceContract.connect(otherAccount).askQuestion(
+        "Is this a real life?"
+      );
+      // ask question as an `otherAccount2`
+      await StanceContract.connect(otherAccount2).askQuestion(
+        "Is this just fantasy?"
+      );
+      // getAllQuestions as `otherAccount`
+      const questions = await StanceContract.connect(
+        otherAccount
+      ).getAllQuestions();
+
+      expect(questions[0].owned).to.be.true;
+      expect(questions[1].owned).to.be.false;
+    });
+
+    it("should return all questions with `alreadyResponded` property", async () => {
+      const { StanceContract, otherAccount, otherAccount2 } = await loadFixture(
+        deployStanceFixture
+      );
+
+      await StanceContract.askQuestion("Is this a real life?");
+      await StanceContract.connect(otherAccount).respondToQuestionPositively(0);
+
+      // `getAllQuestions` by `owner`
+      let questions = await StanceContract.getAllQuestions();
+      expect(questions[0]).to.haveOwnProperty("alreadyResponded");
+      expect(questions[0].alreadyResponded).to.be.false;
+
+      // `getAllQuestions` by `otherAccount`
+      questions = await StanceContract.connect(otherAccount).getAllQuestions();
+      expect(questions[0].alreadyResponded).to.be.true;
+    });
+
     it("should return a proper question by ID", async () => {
       const { StanceContract } = await loadFixture(deployStanceFixture);
 
