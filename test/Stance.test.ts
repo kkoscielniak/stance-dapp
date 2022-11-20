@@ -106,6 +106,10 @@ describe.only("Stance", () => {
       );
 
       await StanceContract.askQuestion("Is this a real life?");
+      await StanceContract.askQuestion("Is this just fantasy?");
+      await StanceContract.askQuestion(
+        "Caught in a landside, No escape from reality?"
+      );
 
       await StanceContract.connect(otherAccount).respondToQuestionPositively(0);
       await StanceContract.connect(otherAccount2).respondToQuestionPositively(
@@ -113,6 +117,28 @@ describe.only("Stance", () => {
       );
       await expect(
         StanceContract.connect(otherAccount).respondToQuestionPositively(0)
+      ).to.be.revertedWith("Can't answer the same question twice");
+
+      await StanceContract.connect(otherAccount).respondToQuestionPositively(1);
+      await StanceContract.connect(otherAccount2).respondToQuestionPositively(
+        1
+      );
+
+      await expect(
+        StanceContract.connect(otherAccount).respondToQuestionPositively(1)
+      ).to.be.revertedWith("Can't answer the same question twice");
+
+      await expect(
+        StanceContract.connect(otherAccount2).respondToQuestionPositively(1)
+      ).to.be.revertedWith("Can't answer the same question twice");
+
+      await StanceContract.connect(otherAccount).respondToQuestionPositively(2);
+      await StanceContract.connect(otherAccount2).respondToQuestionPositively(
+        2
+      );
+
+      await expect(
+        StanceContract.connect(otherAccount).respondToQuestionPositively(2)
       ).to.be.revertedWith("Can't answer the same question twice");
     });
 
