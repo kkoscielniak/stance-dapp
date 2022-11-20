@@ -71,5 +71,3 @@ contract Stance {
         answeredQuestionsMapping[msg.sender] = questions[_id];
     }
 }
-
-// require(answeredQuestionsMapping[msg.sender].author != msg.sender); - only other people can answer the qiestion by msg.sender
