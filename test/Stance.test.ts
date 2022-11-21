@@ -1,6 +1,10 @@
 import { ethers } from "hardhat";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
-import { expect } from "chai";
+import chai, { expect } from "chai";
+import { smock } from "@defi-wonderland/smock";
+import { Stance__factory } from "../typechain-types";
+import { BigNumber } from "ethers";
+chai.use(smock.matchers);
 
 describe("Stance", () => {
   const deployStanceFixture = async () => {
@@ -9,7 +13,13 @@ describe("Stance", () => {
     const StanceContractFactory = await ethers.getContractFactory("Stance");
     const StanceContract = await StanceContractFactory.deploy();
 
-    return { StanceContract, owner, otherAccount, otherAccount2 };
+    return {
+      StanceContract,
+      StanceContractFactory,
+      owner,
+      otherAccount,
+      otherAccount2,
+    };
   };
 
   describe("Asking questions", () => {
@@ -39,11 +49,29 @@ describe("Stance", () => {
         .withArgs(0, "Is this a real life?", owner.address);
     });
 
+    it("should fund the contract when asking a question", async () => {
+      const { StanceContract } = await loadFixture(
+        deployStanceFixture
+      );
+
+      await StanceContract.askQuestion("Is this a real life?", {
+        value: ethers.utils.parseEther("0.001"),
+      });
+      await StanceContract.askQuestion("Is this just fantasy?", {
+        value: ethers.utils.parseEther("0.001"),
+      });
+
+      expect(
+        await StanceContract.provider.getBalance(StanceContract.address)
+      ).to.equal(ethers.utils.parseEther("0.002"));
+    });
+
     it("should throw an error if the function call does not have value", async () => {
       const { StanceContract, owner } = await loadFixture(deployStanceFixture);
 
-      await expect(StanceContract.askQuestion("Is this a real life?")).to
-        .be.revertedWith("Asking question costs 0.001 ether");
+      await expect(
+        StanceContract.askQuestion("Is this a real life?")
+      ).to.be.revertedWith("Asking question costs 0.001 ether");
     });
   });
 
@@ -188,6 +216,38 @@ describe("Stance", () => {
       await expect(
         StanceContract.connect(owner).respondToQuestionPositively(0)
       ).to.be.revertedWith("Can't answer your own question");
+    });
+  });
+
+  describe("Calculating and transferring the prize", async () => {
+    it.skip("[SKIPPED] should transfer the prize pool to an account if the random number > 50", async () => {
+      const { owner, otherAccount } = await loadFixture(deployStanceFixture);
+
+      const MockStanceContractFactory = await smock.mock<Stance__factory>(
+        "Stance"
+      );
+      const MockStanceContract = await MockStanceContractFactory.deploy();
+
+      // Mocking `getRandomNumber` does not work for some reason
+      MockStanceContract.getRandomNumber.returns(BigNumber.from("75"));
+
+      await MockStanceContract.connect(owner).askQuestion(
+        "Is this a real life?",
+        {
+          value: ethers.utils.parseEther("0.001"),
+        }
+      );
+
+      const preTxnOtherAccountBalance = await otherAccount.getBalance();
+
+      await MockStanceContract.connect(
+        otherAccount
+      ).respondToQuestionNegatively(0);
+
+      const postTxnOtherAccountBalance = await otherAccount.getBalance();
+
+      expect(await MockStanceContract.provider.getBalance(MockStanceContract.address)).to.equal(0);
+      expect(postTxnOtherAccountBalance).to.be.above(preTxnOtherAccountBalance);
     });
   });
 });

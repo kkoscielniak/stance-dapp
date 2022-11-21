@@ -27,12 +27,28 @@ contract Stance {
     }
 
     Question[] private questions;
+    uint256 private seed;
 
     mapping(address => mapping(uint => bool)) answeredQuestions;
 
     event QuestionAsked(uint id, string question, address author);
 
-    constructor() {}
+    constructor() {
+        seed = (block.timestamp + block.difficulty) % 100;
+    }
+
+    /**
+     * @notice Generates a random number
+     * @dev This is a deterministic and NOT SAFE FOR PRODUCTION.
+     * Since this contract is a demo for learning purposes, I can live with that,
+     * but for production-class contract I would use Chainlink VRF.
+     * Also, this fn is public for testing purposes.
+     * @return random number in range [0, 99]
+     */
+    function getRandomNumber() public returns (uint256) {
+        seed = (seed + block.timestamp + block.difficulty) % 100;
+        return seed;
+    }
 
     function askQuestion(string memory _question) public payable requiredToPay {
         Question memory question = Question(
@@ -58,6 +74,18 @@ contract Stance {
         return questions[id];
     }
 
+    function calculateAndTransferThePrize() private {
+        if (address(this).balance == 0) {
+            return;
+        }
+
+        uint256 rand = getRandomNumber();
+
+        if (rand >= 50) {
+            payable(msg.sender).transfer(address(this).balance);
+        }
+    }
+
     // TODO: Describe why they are split instead of taking a parameter
     function respondToQuestionPositively(uint _id)
         public
@@ -65,6 +93,7 @@ contract Stance {
         onlyNonOwner(_id)
     {
         Question storage _question = questions[_id];
+        calculateAndTransferThePrize();
         _question.positiveResponsesCount++; // TODO use SafeMath
         answeredQuestions[msg.sender][_id] = true;
     }
@@ -75,6 +104,7 @@ contract Stance {
         onlyNonOwner(_id)
     {
         Question storage _question = questions[_id];
+        calculateAndTransferThePrize();
         _question.negativeResponsesCount++; // TODO use SafeMath
         answeredQuestions[msg.sender][_id] = true;
     }

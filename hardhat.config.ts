@@ -1,10 +1,21 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
+import "@nomiclabs/hardhat-ethers";
 import "hardhat-watcher";
+
 require("dotenv").config();
 
 const config: HardhatUserConfig = {
-  solidity: "0.8.17",
+  solidity: {
+    version: "0.8.17",
+    settings: {
+      outputSelection: {
+        "*": {
+          "*": ["storageLayout"],
+        },
+      },
+    },
+  },
   networks: {
     goerli: {
       url: process.env.STAGING_QUICKNODE_KEY,
@@ -13,7 +24,7 @@ const config: HardhatUserConfig = {
   },
   watcher: {
     test: {
-      files: ['./contracts', "./test"],
+      files: ["./contracts", "./test"],
       tasks: [{ command: "test" }],
     },
   },
