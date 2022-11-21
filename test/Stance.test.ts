@@ -2,7 +2,7 @@ import { ethers } from "hardhat";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 
-describe.only("Stance", () => {
+describe("Stance", () => {
   const deployStanceFixture = async () => {
     const [owner, otherAccount, otherAccount2] = await ethers.getSigners();
 
@@ -16,8 +16,12 @@ describe.only("Stance", () => {
     it("should ask a question", async () => {
       const { StanceContract } = await loadFixture(deployStanceFixture);
 
-      await StanceContract.askQuestion("Is this a real life?");
-      await StanceContract.askQuestion("Is this just fantasy?");
+      await StanceContract.askQuestion("Is this a real life?", {
+        value: ethers.utils.parseEther("0.001"),
+      });
+      await StanceContract.askQuestion("Is this just fantasy?", {
+        value: ethers.utils.parseEther("0.001"),
+      });
       const questions = await StanceContract.getAllQuestions();
 
       expect(questions.length).to.eq(2);
@@ -26,9 +30,20 @@ describe.only("Stance", () => {
     it("should emit an event once the question has been asked", async () => {
       const { StanceContract, owner } = await loadFixture(deployStanceFixture);
 
-      await expect(await StanceContract.askQuestion("Is this a real life?"))
+      await expect(
+        await StanceContract.askQuestion("Is this a real life?", {
+          value: ethers.utils.parseEther("0.001"),
+        })
+      )
         .to.emit(StanceContract, "QuestionAsked")
         .withArgs(0, "Is this a real life?", owner.address);
+    });
+
+    it("should throw an error if the function call does not have value", async () => {
+      const { StanceContract, owner } = await loadFixture(deployStanceFixture);
+
+      await expect(StanceContract.askQuestion("Is this a real life?")).to
+        .be.revertedWith("Asking question costs 0.001 ether");
     });
   });
 
@@ -36,8 +51,12 @@ describe.only("Stance", () => {
     it("should return all questions", async () => {
       const { StanceContract } = await loadFixture(deployStanceFixture);
 
-      await StanceContract.askQuestion("Is this a real life?");
-      await StanceContract.askQuestion("Is this just fantasy?");
+      await StanceContract.askQuestion("Is this a real life?", {
+        value: ethers.utils.parseEther("0.001"),
+      });
+      await StanceContract.askQuestion("Is this just fantasy?", {
+        value: ethers.utils.parseEther("0.001"),
+      });
       const questions = await StanceContract.getAllQuestions();
 
       expect(questions.length).to.eq(2);
@@ -46,8 +65,12 @@ describe.only("Stance", () => {
     it("should return a proper question by ID", async () => {
       const { StanceContract } = await loadFixture(deployStanceFixture);
 
-      await StanceContract.askQuestion("Is this a real life?");
-      await StanceContract.askQuestion("Is this just fantasy?");
+      await StanceContract.askQuestion("Is this a real life?", {
+        value: ethers.utils.parseEther("0.001"),
+      });
+      await StanceContract.askQuestion("Is this just fantasy?", {
+        value: ethers.utils.parseEther("0.001"),
+      });
       const questionById = await StanceContract.getQuestionById(1);
 
       expect(questionById.question).to.eq("Is this just fantasy?");
@@ -60,7 +83,9 @@ describe.only("Stance", () => {
         deployStanceFixture
       );
 
-      await StanceContract.askQuestion("Is this a real life?");
+      await StanceContract.askQuestion("Is this a real life?", {
+        value: ethers.utils.parseEther("0.001"),
+      });
 
       await StanceContract.connect(otherAccount).respondToQuestionPositively(0);
 
@@ -74,7 +99,9 @@ describe.only("Stance", () => {
         deployStanceFixture
       );
 
-      await StanceContract.askQuestion("Is this just fantasy?");
+      await StanceContract.askQuestion("Is this just fantasy?", {
+        value: ethers.utils.parseEther("0.001"),
+      });
 
       await StanceContract.connect(otherAccount).respondToQuestionNegatively(0);
 
@@ -88,7 +115,9 @@ describe.only("Stance", () => {
         deployStanceFixture
       );
 
-      await StanceContract.askQuestion("Is this both?");
+      await StanceContract.askQuestion("Is this both?", {
+        value: ethers.utils.parseEther("0.001"),
+      });
 
       await StanceContract.connect(otherAccount).respondToQuestionNegatively(0);
       await StanceContract.connect(otherAccount2).respondToQuestionPositively(
@@ -105,10 +134,17 @@ describe.only("Stance", () => {
         deployStanceFixture
       );
 
-      await StanceContract.askQuestion("Is this a real life?");
-      await StanceContract.askQuestion("Is this just fantasy?");
+      await StanceContract.askQuestion("Is this a real life?", {
+        value: ethers.utils.parseEther("0.001"),
+      });
+      await StanceContract.askQuestion("Is this just fantasy?", {
+        value: ethers.utils.parseEther("0.001"),
+      });
       await StanceContract.askQuestion(
-        "Caught in a landside, No escape from reality?"
+        "Caught in a landside, No escape from reality",
+        {
+          value: ethers.utils.parseEther("0.001"),
+        }
       );
 
       await StanceContract.connect(otherAccount).respondToQuestionPositively(0);
@@ -145,7 +181,9 @@ describe.only("Stance", () => {
     it("should not allow the user to answer his own question", async () => {
       const { StanceContract, owner } = await loadFixture(deployStanceFixture);
 
-      await StanceContract.askQuestion("Is this a real life?");
+      await StanceContract.askQuestion("Is this a real life?", {
+        value: ethers.utils.parseEther("0.001"),
+      });
 
       await expect(
         StanceContract.connect(owner).respondToQuestionPositively(0)

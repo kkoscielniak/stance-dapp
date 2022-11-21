@@ -7,7 +7,6 @@ import "./structs/Question.sol";
 contract Stance {
     modifier onlyOncePerUserPerQuestion(uint _id) {
         require(
-            // answeredQuestionsMapping[msg.sender].valid == false,
             answeredQuestions[msg.sender][_id] == false,
             "Can't answer the same question twice"
         );
@@ -22,18 +21,20 @@ contract Stance {
         _;
     }
 
+    modifier requiredToPay() {
+        require(msg.value >= 0.001 ether, "Asking question costs 0.001 ether");
+        _;
+    }
+
     Question[] private questions;
 
-    // mapping(address => Question[]) answeredQuestionsMapping;
-    mapping(address => mapping(uint => bool)) answeredQuestions; 
+    mapping(address => mapping(uint => bool)) answeredQuestions;
 
     event QuestionAsked(uint id, string question, address author);
 
-    constructor() {
-        console.log("test");
-    }
+    constructor() {}
 
-    function askQuestion(string memory _question) public {
+    function askQuestion(string memory _question) public payable requiredToPay {
         Question memory question = Question(
             true,
             msg.sender,
@@ -65,7 +66,6 @@ contract Stance {
     {
         Question storage _question = questions[_id];
         _question.positiveResponsesCount++; // TODO use SafeMath
-        // answeredQuestionsMapping[msg.sender] = questions[_id];
         answeredQuestions[msg.sender][_id] = true;
     }
 
@@ -76,8 +76,6 @@ contract Stance {
     {
         Question storage _question = questions[_id];
         _question.negativeResponsesCount++; // TODO use SafeMath
-        // answeredQuestionsMapping[msg.sender] = questions[_id];
-        // answeredQuestions[msg.sender].push(_id);
         answeredQuestions[msg.sender][_id] = true;
     }
 }
