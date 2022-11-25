@@ -1,19 +1,14 @@
-# Stance dApp
+# Stance Demo dApp
 
-<!-- This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
-
-Try running some of the following tasks:
-
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.ts
-``` -->
+A very first smart contract I wrote for learning purposes. WIP.
 
 ## Development
 ### Local node
 To deploy Stance smart contract to a local Ethereum network:
 1. Start Hardhat's local node with `yarn local-node`
-2. Run `yarn local`
+1. Run `yarn local`
+
+## Deployment
+To deploy Stance smart contract to Goerli w/QuickNode:
+1. Add `.env` file with necessary values (see `.env.template`)
+1. run `yarn deploy`
